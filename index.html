@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8' />
+<meta content='width=device-width, initial-scale=1, user-scalable=1, minimum-scale=1, maximum-scale=5' name='viewport' />
+<meta content='IE=edge' http-equiv='X-UA-Compatible' />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
+<title>Happy Birthday</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat&family=Itim&family=Pacifico&display=swap');
+
+  :root {
+    --warna-bg: rgba(0, 0, 0, .3); 
+    --tombol-teks: #fff;
+    --tombol-bingkai: #fff;
+    --bingkai: 18px;
+    --bingkai-kiri: 1.3px solid var(--tombol-bingkai);
+    --bingkai-kanan: 1.3px solid var(--tombol-bingkai);
+    --gaya-font: 'Itim', cursive;
+    --gaya-font2: 'Caveat', cursive;
+    --color-primary: #ffd700; /* Changed to gold for contrast with navy */
+  }
+
+  body {
+    font-family: var(--gaya-font);
+    background-color: #001f3f;
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* Heart container styles */
+  #heartContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.7);
+    transition: all 0.5s ease;
+  }
+
+  #heartContainer.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .lovein {
+    background: #fff;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    padding: 10px;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s infinite;
+  }
+
+  .lovein svg {
+    stroke: #ff0000;
+    stroke-width: 1.3;
+    fill: none;
+    width: 50px;
+    height: 50px;
+  }
+
+  .lovein:hover {
+    transform: scale(1.1);
+  }
+
+  #heartText {
+    color: white;
+    margin-top: 20px;
+    font-size: 18px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Thank you card styles - NAVY BLUE VERSION */
+  #thankYouCard {
+    display: none;
+    position: relative;
+    background: linear-gradient(135deg, #001f3f 0%, #0a3d6b 100%);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--color-primary);
+    max-width: 500px;
+    width: 90%;
+    margin: 20px;
+    color: white; /* Changed text color to white for better contrast */
+    z-index: 10;
+    transform: scale(0);
+    animation: cardAppear 0.5s forwards 0.5s;
+    overflow: hidden;
+  }
+
+  /* Enhanced Profile Picture */
+  .profile-image {
+    width: 160px; /* Increased from 120px */
+    height: 160px; /* Increased from 120px */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--color-primary);
+    margin: 0 auto 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s;
+    animation: bounceIn 1s;
+  }
+
+  .profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+  }
+
+  .title {
+    font-family: 'Pacifico', cursive;
+    color: var(--color-primary);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .message {
+    color: #e0e0e0; /* Lighter gray for better readability */
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .cake {
+    font-size: 4rem;
+    margin: 20px 0;
+    animation: float 3s ease-in-out infinite;
+    color: var(--color-primary);
+  }
+
+  .social {
+    margin-top: 30px;
+  }
+
+  .social p {
+    color: #b0b0b0;
+    margin-bottom: 15px;
+  }
+
+  .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .icon {
+    font-size: 1.8rem;
+    color: var(--color-primary);
+    transition: all 0.3s;
+    text-decoration: none;
+    background: rgba(0, 31, 63, 0.7);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-primary);
+  }
+
+  .icon:hover {
+    transform: scale(1.2) translateY(-5px);
+    box-shadow: 0 6px 10px rgba(255, 215, 0, 0.3);
+    background: var(--color-primary);
+    color: #001f3f;
+  }
+
+  /* Celebration elements */
+  .balloon {
+    position: absolute;
+    font-size: 24px;
+    z-index: -1;
+    animation: floatBalloon 6s ease-in-out infinite;
+    color: var(--color-primary);
+  }
+
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    opacity: 0.7;
+    z-index: -1;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes cardAppear {
+    0% { transform: scale(0); }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.1); opacity: 0; }
+    60% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes floatBalloon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-50px) rotate(5deg); }
+  }
+
+  /* Floating hearts animation */
+  .heart-icon {
+    position: fixed;
+    animation: heartMove linear 1;
+    top: -10vh;
+    z-index: 999;
+    pointer-events: none;
+    color: var(--color-primary);
+  }
+
+  @keyframes heartMove {
+    0% { transform: translateY(-10vh); }
+    100% { transform: translateY(100vh); }
+  }
+
+  /* Responsive design */
+  @media (max-width: 600px) {
+    #thankYouCard {
+      padding: 30px 20px;
+    }
+    .title {
+      font-size: 2rem;
+    }
+    .message {
+      font-size: 1rem;
+    }
+    .profile-image {
+      width: 140px;
+      height: 140px;
+    }
+  }
+  /* Add these new styles for the Joker popup */
+  #jokerPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    flex-direction: column;
+  }
+   #jokerGif {
+    max-width: 80%;
+    max-height: 60vh;
+    border-radius: 10px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+  }
+
+  #closeJoker {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #ffd700;
+    color: #001f3f;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Itim', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+   #closeJoker:hover {
+    background: #001f3f;
+    color: #ffd700;
+    transform: scale(1.1);
+  }
+  
+</style>
+
+<body>
+  <!-- Audio element -->
+  <audio id="birthdayAudio" loop>
+    <source src="bd.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Heart click starter -->
+  <div id="heartContainer">
+    <div class="lovein" id="heartButton">
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+        <g transform='translate(2.550170, 3.550158)'>
+          <path d='M0.371729633,8.89614246 C-0.701270367,5.54614246 0.553729633,1.38114246 4.07072963,0.249142462 C5.92072963,-0.347857538 8.20372963,0.150142462 9.50072963,1.93914246 C10.7237296,0.0841424625 13.0727296,-0.343857538 14.9207296,0.249142462 C18.4367296,1.38114246 19.6987296,5.54614246 18.6267296,8.89614246 C16.9567296,14.2061425 11.1297296,16.9721425 9.50072963,16.9721425 C7.87272963,16.9721425 2.09772963,14.2681425 0.371729633,8.89614246 Z'></path>
+          <path d='M13.23843,4.013842 C14.44543,4.137842 15.20043,5.094842 15.15543,6.435842'></path>
+        </g>
+      </svg>
+    </div>
+    <div id="heartText">Click the heart to begin!</div>
+  </div>
+
+  <!-- Thank you card -->
+  <div id="thankYouCard">
+    <!-- Balloons -->
+    <div class="balloon" style="top: -20px; left: 10%; animation-delay: 0s;">🎈</div>
+    <div class="balloon" style="top: -10px; right: 15%; animation-delay: 1s;">🎈</div>
+    <div class="balloon" style="bottom: -20px; left: 20%; animation-delay: 2s;">🎈</div>
+    <div class="balloon" style="top: 30%; right: -10px; animation-delay: 0.5s;">🎈</div>
+    <div class="balloon" style="bottom: 10%; right: 5%; animation-delay: 1.5s;">🎈</div>
+    
+    <!-- Replace with your image -->
+    <img src="ros1.jpg" alt="Your Name" class="profile-image">
+    
+    <h1 class="title">Thank You!</h1>
+    <p class="message">For all the wonderful birthday wishes that made my day extra special! Your kindness and thoughtfulness mean the world to me.</p>
+    
+   <div class="cake" id="birthdayCake">
+      🎂
+    </div>
+	
+     <div id="jokerPopup">
+    <img id="jokerGif" src="" alt="Laughing Joker">
+    <button id="closeJoker">Close</button>
+  </div>
+   
+      <div class="social">
+    <p>Let's stay connected:</p>
+    <div class="social-icons">
+      <a href="https://www.instagram.com/gold_grace_roshan?igsh=MTBtZHNrZDR4dDA3aw==" class="icon">
+        <!-- Instagram SVG Logo -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffd700">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </a>
+	  <a href="https://wa.me/qr/WAKPI6YSHCA6G1" class="icon">
+        <!-- WhatsApp SVG Logo -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffd700">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+  // Wait for the DOM to be fully loaded before running scripts
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // Heart click functionality
+    document.getElementById('heartButton').addEventListener('click', function() {
+      // Play birthday music
+      const audio = document.getElementById('birthdayAudio');
+      audio.play().catch(e => console.log("Audio play failed:", e));
+      
+      // Create falling hearts animation
+      setInterval(createFallingHeart, 300);
+      
+      // Hide heart container
+      document.getElementById('heartContainer').classList.add('hidden');
+      
+      // Show thank you card
+      setTimeout(function() {
+        document.getElementById('thankYouCard').style.display = 'block';
+        
+        // Launch confetti
+        launchConfetti();
+        
+        // Create balloons
+        createBalloons(10);
+      }, 500);
+    });
+
+    // Cake click functionality for Joker surprise
+    document.getElementById('birthdayCake').addEventListener('click', function() {
+      // Set the Joker GIF source
+      document.getElementById('jokerGif').src = 'funny.gif';
+      
+      // Show the popup
+      document.getElementById('jokerPopup').style.display = 'flex';
+      
+      // Play laughing sound
+      const laughAudio = new Audio('funny.mp3');
+      laughAudio.play().catch(e => console.log("Audio play failed:", e));
+      
+      // Joker-themed confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff0000', '#000000', '#ffd700'] // Red, black, gold
+      });
+    });
+
+    // Close Joker popup
+    document.getElementById('closeJoker').addEventListener('click', function() {
+      document.getElementById('jokerPopup').style.display = 'none';
+    });
+
+    // Create falling hearts animation
+    function createFallingHeart() {
+      const heart = document.createElement("div");
+      heart.innerHTML = `
+        <svg class='heart-icon' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+          <g transform='translate(2.550170, 3.550158)'>
+            <path d='M0.371729633,8.89614246 C-0.701270367,5.54614246 0.553729633,1.38114246 4.07072963,0.249142462 C5.92072963,-0.347857538 8.20372963,0.150142462 9.50072963,1.93914246 C10.7237296,0.0841424625 13.0727296,-0.343857538 14.9207296,0.249142462 C18.4367296,1.38114246 19.6987296,5.54614246 18.6267296,8.89614246 C16.9567296,14.2061425 11.1297296,16.9721425 9.50072963,16.9721425 C7.87272963,16.9721425 2.09772963,14.2681425 0.371729633,8.89614246 Z'></path>
+          </g>
+        </svg>
+      `;
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+      heart.style.opacity = Math.random() * 0.6 + 0.4;
+      heart.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      document.body.appendChild(heart);
+      
+      setTimeout(() => heart.remove(), 5000);
+    }
+
+    // Confetti launch function
+    function launchConfetti() {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ffd700', '#ffffff', '#ff0000', '#00ff00', '#0000ff']
+      });
+      
+      setInterval(() => {
+        confetti({
+          particleCount: 30,
+          spread: 60,
+          origin: { x: Math.random(), y: Math.random() * 0.5 + 0.2 },
+          colors: ['#ffd700', '#ffffff']
+        });
+      }, 3000);
+    }
+
+    // Create balloons function
+    function createBalloons(count) {
+      const balloons = ['🎈', '🎈', '🎈', '🎈', '🎈', '🎉', '🎊'];
+      const colors = ['#ffd700', '#ffffff', '#ff6b6b', '#48dbfb'];
+      
+      for (let i = 0; i < count; i++) {
+        const balloon = document.createElement('div');
+        balloon.className = 'balloon';
+        balloon.textContent = balloons[Math.floor(Math.random() * balloons.length)];
+        balloon.style.left = Math.random() * 100 + 'vw';
+        balloon.style.top = Math.random() * 100 + 'vh';
+        balloon.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        balloon.style.color = colors[Math.floor(Math.random() * colors.length)];
+        balloon.style.animationDuration = (Math.random() * 8 + 4) + 's';
+        balloon.style.animationDelay = (Math.random() * 5) + 's';
+        document.body.appendChild(balloon);
+        
+        setTimeout(() => balloon.remove(), 15000);
+      }
+    }
+  });
+</script>
+  
+</body>
+</html>
